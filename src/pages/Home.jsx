@@ -205,7 +205,7 @@ export default function Home() {
             </motion.p>
             <motion.div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6" variants={textChild}>
               <Link
-                to="/tech"
+                to="/tech?type=HARVESTER"
                 className={`${btnBase} ${btnSize} ${btnSolidGreen} w-1/2 sm:w-auto`}
               >
                 Найти сейчас
@@ -252,7 +252,7 @@ export default function Home() {
             </motion.p>
             <motion.div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6" variants={textChild}>
               <Link
-                to="/tech"
+                to="/tech?type=FORWARDER"
                 className={`${btnBase} ${btnSize} ${btnSolidPurple} w-1/2 sm:w-auto`}
               >
                 Найти сейчас
@@ -299,7 +299,7 @@ export default function Home() {
             </motion.p>
             <motion.div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6" variants={textChild}>
               <Link
-                to="/tech"
+                to="/tech?type=HARVESTER_HEAD"
                 className={`${btnBase} ${btnSize} ${btnSolidYellow} w-1/2 sm:w-auto`}
               >
                 Найти сейчас
