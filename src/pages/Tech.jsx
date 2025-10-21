@@ -10,20 +10,32 @@ import CatalogFilters from "../components/CatalogFilters";
 export default function Tech() {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // ===== ИНИЦИАЛИЗАЦИЯ ИЗ URL синхронно =====
+  const initType = (() => {
+    const t = searchParams.get("type");
+    return t === "HARVESTER" || t === "FORWARDER" || t === "HARVESTER_HEAD" ? t : "";
+  })();
+  const initBrand = searchParams.get("brand") || "";
+  const initYear = searchParams.get("year") || "";
+  const initMin = searchParams.get("min") || "";
+  const initMax = searchParams.get("max") || "";
+  const initQ = searchParams.get("q") || "";
+  const initPage = Math.max(1, Number(searchParams.get("page") || "1"));
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initPage);
   const [total, setTotal] = useState(0);
   const pageSize = 12;
 
   // фильтры
-  const [type, setType] = useState("");
-  const [brand, setBrand] = useState("");
-  const [year, setYear] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [q, setQ] = useState("");
+  const [type, setType] = useState(initType);
+  const [brand, setBrand] = useState(initBrand);
+  const [year, setYear] = useState(initYear);
+  const [minPrice, setMinPrice] = useState(initMin);
+  const [maxPrice, setMaxPrice] = useState(initMax);
+  const [q, setQ] = useState(initQ);
 
   // Опции
   const [brandOptions, setBrandOptions] = useState([]);
@@ -32,27 +44,32 @@ export default function Tech() {
   // кол-во страниц
   const pages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total]);
 
-  /* ==== 1) Инициализация из URL один раз ==== */
+  // ===== РЕАКЦИЯ НА СМЕНУ URL (например, приход с главной с новым type) =====
   useEffect(() => {
     const t = searchParams.get("type");
-    const b = searchParams.get("brand");
-    const y = searchParams.get("year");
-    const sMin = searchParams.get("min");
-    const sMax = searchParams.get("max");
-    const sQ = searchParams.get("q");
-    const p = Number(searchParams.get("page") || "1");
+    const b = searchParams.get("brand") || "";
+    const y = searchParams.get("year") || "";
+    const sMin = searchParams.get("min") || "";
+    const sMax = searchParams.get("max") || "";
+    const sQ = searchParams.get("q") || "";
+    const p = Math.max(1, Number(searchParams.get("page") || "1"));
 
-    if (t === "HARVESTER" || t === "FORWARDER" || t === "HARVESTER_HEAD") setType(t);
-    if (b) setBrand(b);
-    if (y && /^\d{4}$/.test(y)) setYear(y);
-    if (sMin) setMinPrice(sMin);
-    if (sMax) setMaxPrice(sMax);
-    if (sQ) setQ(sQ);
-    if (Number.isFinite(p) && p > 0) setPage(p);
+    const normType =
+      t === "HARVESTER" || t === "FORWARDER" || t === "HARVESTER_HEAD" ? t : "";
+
+    // Обновим стейт только если значения реально изменились,
+    // чтобы лишний раз не триггерить загрузку
+    if (normType !== type) setType(normType);
+    if (b !== brand) setBrand(b);
+    if (y !== year) setYear(y);
+    if (sMin !== minPrice) setMinPrice(sMin);
+    if (sMax !== maxPrice) setMaxPrice(sMax);
+    if (sQ !== q) setQ(sQ);
+    if (p !== page) setPage(p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // только на первом рендере
+  }, [searchParams]); // слушаем именно изменения URL
 
-  /* ==== 2) Подгрузка опций при старте и смене type ==== */
+  // ===== Подгрузка опций при старте и смене type =====
   useEffect(() => {
     (async () => {
       try {
@@ -62,10 +79,9 @@ export default function Tech() {
         const ys = [];
         const minY = meta.yearRange?.min ?? null;
         const maxY = meta.yearRange?.max ?? null;
-        if (minY && maxY) {
-          for (let y = maxY; y >= minY; y--) ys.push(y);
-        }
+        if (minY && maxY) for (let y = maxY; y >= minY; y--) ys.push(y);
         setYearOptions(ys);
+
         // если текущие brand/year выпали из опций — сбросим
         if (brand && !meta.brands?.includes(brand)) setBrand("");
         if (year && !ys.includes(Number(year))) setYear("");
@@ -77,7 +93,7 @@ export default function Tech() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
-  /* ==== 3) Загрузка каталога ==== */
+  // ===== Загрузка каталога =====
   async function load() {
     setLoading(true);
     setError("");
@@ -85,12 +101,13 @@ export default function Tech() {
       const data = await listProducts({
         page,
         pageSize,
-        type,
-        q,
-        minPrice,
-        maxPrice,
-        brand,
-        year,
+        // нормализуем значения: пустые -> undefined
+        type: type || undefined,
+        brand: brand || undefined,
+        year: year ? Number(year) : undefined,
+        q: q || undefined,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
       });
       setItems(data.items || []);
       setTotal(Number(data.total || 0));
@@ -104,7 +121,7 @@ export default function Tech() {
     }
   }
 
-  // при изменении фильтров: на 1-ю страницу
+  // при изменении фильтров: на 1-ю страницу (и это попадёт в URL синхронизацией ниже)
   useEffect(() => {
     setPage(1);
   }, [type, brand, year, minPrice, maxPrice, q]);
@@ -115,15 +132,15 @@ export default function Tech() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, type, brand, year, minPrice, maxPrice, q]);
 
-  /* ==== 4) Синхронизация состояния -> URL ==== */
+  // ===== Синхронизация состояния -> URL =====
   useEffect(() => {
     const params = new URLSearchParams();
     if (type) params.set("type", type);
     if (brand) params.set("brand", brand);
     if (year) params.set("year", year);
     if (q) params.set("q", q);
-    if (minPrice) params.set("min", minPrice);
-    if (maxPrice) params.set("max", maxPrice);
+    if (minPrice) params.set("min", String(minPrice));
+    if (maxPrice) params.set("max", String(maxPrice));
     if (page > 1) params.set("page", String(page));
     setSearchParams(params, { replace: true });
   }, [type, brand, year, q, minPrice, maxPrice, page, setSearchParams]);
