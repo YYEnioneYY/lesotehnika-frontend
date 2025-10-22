@@ -64,10 +64,12 @@ export default function ProductCard({ product }) {
           {product.title}
         </h3>
 
-        <div className="mt-2 text-sm text-white/70 flex items-center gap-2">
-          <span className="">Наработка</span>
-          <span className="">{product.hours} м/ч</span>
-        </div>
+        {product.hours !== null && product.hours !== undefined && (
+          <div className="mt-2 text-sm text-white/70 flex items-center gap-2">
+            <span>Наработка</span>
+            <span>{product.hours} м/ч</span>
+          </div>
+        )}
 
         {/* нижний акцент при hover */}
         <span
