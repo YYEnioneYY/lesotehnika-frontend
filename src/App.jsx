@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Tech from "./pages/Tech";
 import ContactsPage from "./pages/ContactsPage";
 import Product from "./pages/Product";
+import NotFound from "./pages/NotFound";
 
 function Protected({ children }) {
   const token = localStorage.getItem("token");
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/tech" element={<Tech />} />
         <Route path="/product/:idOrSlug" element={<Product />} />
         <Route path="/contacts" element={<ContactsPage />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/table" element={<Protected><AdminPage /></Protected>} />
       </Routes>
