@@ -1,9 +1,9 @@
 import NavBar from "../components/NavBar";
 import { Link } from "react-router-dom";
-import heroImg from "../assets/images/heroImg2.png";
-import harvImg from "../assets/images/harvImg2.png";
-import forwarderImg from "../assets/images/forwarderImg2.png";
-import harvHeadImg from "../assets/images/harvHeadImg.png";
+import heroImg from "../assets/images/heroImg3.png";
+import harvImg from "../assets/images/harvImg3.png";
+import forwarderImg from "../assets/images/forwarderImg3.png";
+import harvHeadImg from "../assets/images/harvHeadImg3.png";
 
 import gear from "../assets/icons/gear.png";
 import arm from "../assets/icons/arm.png";
