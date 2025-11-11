@@ -7,6 +7,11 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
+  body {
+    background-color: #0e0e0e;
+    color-scheme: dark;
+  }
+
   /* Заголовки на Montserrat */
   h1, h2, h3 {
     font-family: "Montserrat Variable", "Montserrat", ui-sans-serif, system-ui,

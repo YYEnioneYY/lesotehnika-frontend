@@ -168,7 +168,7 @@ export default function Tech() {
         </p>
       </div>
 
-      <div className="bg-[linear-gradient(to_bottom,_#0e0e0e_0%,_#333333_100%)]">
+      <div className="min-h-screen bg-[linear-gradient(to_bottom,_#0e0e0e_0%,_#333333_100%)]">
         <div className="space-y-6 pb-16 mx-4 sm:mx-6 md:mx-8 lg:mx-24">
           <CatalogFilters
             type={type} setType={setType}
